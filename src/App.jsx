@@ -6,20 +6,24 @@ function App(){
   const [query, setQuery] = useState('');
   const [shows, setShows] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   async function fetchShows(searchTerm){
     try {
       setError("")
-
+      setLoading(true)
       const response = await api.get(searchTerm);
       setShows(response.data);
     } catch (err) {
       setError('Não foi possivel carregar os dados da API', err)
-    } finally {}
+      setShows([])
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
-    fetchShows(query);
+    fetchShows('');
   }, [])
 
   function handlerSubmit(event) {
@@ -27,6 +31,7 @@ function App(){
     setError("")
     if (!query.trim()) {
       setError("Digite um titulo para pesquisar.");
+      setShows([])
       return;
     }
 
@@ -49,6 +54,7 @@ function App(){
       <button type="submit">Pesquisar</button>
 
       </form>
+      {loading && <p>Carregando Dados...</p>}
       {error && <p>{error}</p>}
 
       <ul className='show-list'>
